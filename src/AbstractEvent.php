@@ -39,7 +39,7 @@ abstract class AbstractEvent extends BaseAbstractEvent
     protected $status;
 
     /** @var string Event's etag */
-    private $etag;
+    protected $etag;
 
     /** @var User[] All the fetched and hydrated users, with an id as a key **/
     protected static $users = [];
@@ -139,6 +139,19 @@ abstract class AbstractEvent extends BaseAbstractEvent
         }
 
         return $date;
+    }
+
+    /**
+     * Return Google object
+     *
+     * @return array
+     */
+    public function export()
+    {
+        return [
+            'description' => $this->getDescription(),
+            'attendees' => $this->getParticipations()->map(function(EventParticipation $participation) { return $participation->export(); })->toArray(),
+        ];
     }
 }
 

@@ -11,12 +11,15 @@
 
 namespace CalendArt\Adapter\Google;
 
+use InvalidArgumentException;
+
 use GuzzleHttp\Client as Guzzle;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
 use CalendArt\Adapter\EventApiInterface,
     CalendArt\Adapter\AbstractCriterion,
+    CalendArt\AbstractEvent as CalendArtAbstractEvent,
     CalendArt\Adapter\Exception\CriterionNotFoundException,
 
     CalendArt\Adapter\Google\Event\BasicEvent,
@@ -147,6 +150,27 @@ class EventApi implements EventApiInterface
         }
 
         $response = $this->guzzle->get(sprintf('calendars/%s/events/%s', $this->calendar->getId(), $identifier), ['query' => $query->build()]);
+
+        if (200 > $response->getStatusCode() || 300 <= $response->getStatusCode()) {
+            throw new ApiErrorException($response);
+        }
+
+        return BasicEvent::hydrate($this->calendar, $response->json());
+    }
+
+    public function persist(CalendArtAbstractEvent $event)
+    {
+        if (!$event instanceof AbstractEvent) {
+            throw new InvalidArgumentException('Wrong event provided, expected a google event');
+        }
+
+        $url = sprintf('calendars/%s/events/%s', $event->getCalendar()->getId(), $event->getId());
+        $options = [
+            'headers' => ['Content-Type' => 'application/json'],
+            'body' => json_encode($event->export())
+        ];
+
+        $response = $this->guzzle->patch($url, $options);
 
         if (200 > $response->getStatusCode() || 300 <= $response->getStatusCode()) {
             throw new ApiErrorException($response);
