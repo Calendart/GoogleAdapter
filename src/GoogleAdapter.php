@@ -21,8 +21,7 @@ use CalendArt\Adapter\AdapterInterface,
     CalendArt\Adapter\Google\Criterion\Collection,
     CalendArt\Adapter\Google\Exception\ApiErrorException,
 
-    CalendArt\AbstractCalendar,
-    CalendArt\Adapter\Google\Util\OAuth2Token;
+    CalendArt\AbstractCalendar;
 
 
 /**
@@ -31,10 +30,6 @@ use CalendArt\Adapter\AdapterInterface,
  * This requires to have an OAuth2 token established with the following scopes :
  * - email
  * - https://www.googleapis.com/auth/calendar
- *
- * But, as this currently only support reading from the apis, you can may use
- * the following instead of the last one (the full calendar scope) :
- *  - https://www.googleapis.com/auth/calendar.readonly
  *
  * @author Baptiste Clavié <baptiste@wisembly.com>
  */
@@ -52,10 +47,11 @@ class GoogleAdapter implements AdapterInterface
     /** @var User Current user, associated with the given token */
     private $user;
 
-    public function __construct(OAuth2Token $token)
+    /** @param string $token access token delivered by google's oauth system */
+    public function __construct($token)
     {
         $this->guzzle = new Guzzle(['base_url' => 'https://www.googleapis.com/calendar/v3/',
-                                    'defaults' => ['headers'    => ['Authorization' => sprintf('%s %s', $token->type, $token->token)],
+                                    'defaults' => ['headers'    => ['Authorization' => sprintf('Bearer %s', $token)],
                                                    'exceptions' => false]]);
     }
 
