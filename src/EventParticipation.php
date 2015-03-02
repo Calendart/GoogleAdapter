@@ -62,5 +62,18 @@ class EventParticipation extends BaseEventParticipation
                 throw new InvalidArgumentException(sprintf('Unrecognized status to translate. Expected on of ["needsAction", "declined", "tentative", "accepted"], got "%s"', $status));
         }
     }
+
+    /**
+     * Export Google object
+     *
+     * @return array
+     */
+    public function export()
+    {
+        return [
+            'email' => $this->getUser()->getEmail(),
+            'responseStatus' => $this->getStatus(),
+        ];
+    }
 }
 

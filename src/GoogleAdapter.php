@@ -11,11 +11,11 @@
 
 namespace CalendArt\Adapter\Google;
 
+use InvalidArgumentException;
+
 use GuzzleHttp\Client as Guzzle;
 
 use CalendArt\Adapter\AdapterInterface,
-    CalendArt\Adapter\EventApiInterface,
-    CalendArt\Adapter\CalendarApiInterface,
 
     CalendArt\Adapter\Google\Criterion\Field,
     CalendArt\Adapter\Google\Criterion\Collection,
