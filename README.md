@@ -26,7 +26,7 @@ with [the archive release](#archive-release).
 
       {
         "require": {
-          "calendArt/google-adapter": "~1.0"
+          "calendArt/google-adapter": "~1.1"
         }
       }
     ```
