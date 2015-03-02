@@ -26,7 +26,7 @@ class Calendar extends AbstractCalendar
     /** @var string Calendar's id */
     protected $id;
 
-    /** @var DateTimeZone Calendar's timeZone */
+    /** @var DateTimeZone|null Calendar's timeZone */
     protected $timeZone;
 
     /** @var When fetching a list, fetch only starting a certain token */
@@ -35,7 +35,7 @@ class Calendar extends AbstractCalendar
     /** @var array $raw The raw response stored for this object */
     protected $raw;
 
-    public function __construct($id, $name, DateTimeZone $timeZone)
+    public function __construct($id, $name = null, DateTimeZone $timeZone = null)
     {
         $this->id       = $id;
         $this->timeZone = $timeZone;
@@ -84,7 +84,7 @@ class Calendar extends AbstractCalendar
      */
     public static function hydrate(array $data, User $user = null)
     {
-        if (!isset($data['id'], $data['summary'], $data['timeZone'])) {
+        if (!isset($data['id']) || !array_key_exists('summary',  $data) || !array_key_exists('timeZone', $data)) {
             throw new InvalidArgumentException(sprintf('Missing at least one of the mandatory properties "id", "summary" or "timeZone" ; got ["%s"]', implode('", "', array_keys($data))));
         }
 

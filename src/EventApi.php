@@ -59,6 +59,7 @@ class EventApi implements EventApiInterface
                          new Field('updated'),
                          new Field('summary'),
                          new Field('location'),
+                         new Field('organizer'),
                          new Field('description'),
                          new Field('creator', [new Field('email'),
                                                new Field('displayName')]),
@@ -76,6 +77,9 @@ class EventApi implements EventApiInterface
         $nextPageToken = null;
         $query         = new Collection([]);
         $list          = new ArrayCollection;
+        $calendars     = new ArrayCollection;
+
+        $calendars[$this->calendar->getId()] = $this->calendar;
 
         if (null !== $this->calendar->getSyncToken()) {
             $query->addCriterion(new Collection([new Field($this->calendar->getSyncToken())], 'nextSyncToken'));
@@ -120,7 +124,45 @@ class EventApi implements EventApiInterface
                     continue;
                 }
 
-                $list[$item['id']] = BasicEvent::hydrate($this->calendar, $item);
+                $calendar = $this->calendar;
+
+                // match the _real_ calendar for this event
+                if (isset($item['organizer']) && (!isset($item['organizer']['self']) || false === $item['organizer']['self'])) {
+                    try {
+                        $data = $item['organizer'];
+
+                        // the email is usually an identifier for the calendars
+                        if (!isset($data['id'])) {
+                            if (!isset($data['email'])) {
+                                throw new InvalidArgumentException;
+                            }
+
+                            $data['id'] = $data['email'];
+                        }
+
+                        if (!isset($calendars[$data['id']])) {
+                            $data += ['summary' => !isset($data['displayName'])
+                                        ? !isset($data['email'])
+                                            ? null
+                                            : $data['email']
+                                        : $data['displayName'],
+
+                                      'timeZone' => null];
+
+                            $calendars[$data['id']] = Calendar::hydrate($data);
+                        }
+
+                        $calendar = $calendars[$data['id']];
+                    } catch (InvalidArgumentException $e) {
+                        $calendar = $this->calendar;
+                    }
+                }
+
+                $list[$item['id']] = BasicEvent::hydrate($calendar, $item);
+
+                if ($calendar !== $this->calendar) {
+                    $this->calendar->getEvents()->add($list[$item['id']]);
+                }
             }
 
             $nextPageToken = isset($result['nextPageToken']) ? $result['nextPageToken'] : null;
