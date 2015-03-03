@@ -200,6 +200,7 @@ class EventApi implements EventApiInterface
         return BasicEvent::hydrate($this->calendar, $response->json());
     }
 
+    /** {@inheritDoc} */
     public function persist(CalendArtAbstractEvent $event)
     {
         if (!$event instanceof AbstractEvent) {
@@ -207,6 +208,7 @@ class EventApi implements EventApiInterface
         }
 
         $url = sprintf('calendars/%s/events/%s', $event->getCalendar()->getId(), $event->getId());
+
         $options = [
             'headers' => ['Content-Type' => 'application/json'],
             'body' => json_encode($event->export())
@@ -217,8 +219,6 @@ class EventApi implements EventApiInterface
         if (200 > $response->getStatusCode() || 300 <= $response->getStatusCode()) {
             throw new ApiErrorException($response);
         }
-
-        return BasicEvent::hydrate($this->calendar, $response->json());
     }
 }
 
