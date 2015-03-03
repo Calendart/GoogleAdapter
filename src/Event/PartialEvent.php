@@ -4,15 +4,23 @@ namespace CalendArt\Adapter\Google\Event;
 
 use DateTime;
 
-use CalendArt\EventParticipation as BaseEventParticipation,
+use CalendArt\Adapter\Google\PartialInterface,
+    CalendArt\EventParticipation as BaseEventParticipation;
 
-    CalendArt\Adapter\Google\PartialInterface;
-
+/**
+ * Represents a PATCH'd event
+ *
+ * this is used to make a patch, and dump only changed properties
+ * of a BasicEvent
+ *
+ * @author Rémy Gazelot <r.gazelot@gmail.com>
+ */
 class PartialEvent extends BasicEvent implements PartialInterface
 {
-    /** @var array $proxyProperties */
+    /** @var array */
     private $changedProperties = [];
 
+    /** {@inheritDoc} */
     public function setVisibility($visibility)
     {
         $this->changedProperties['visibility'] = true;
@@ -20,6 +28,7 @@ class PartialEvent extends BasicEvent implements PartialInterface
         parent::setVisibility($visibility);
     }
 
+    /** {@inheritDoc} */
     public function setStackable($stackable)
     {
         $this->changedProperties['stackable'] = true;
@@ -27,7 +36,7 @@ class PartialEvent extends BasicEvent implements PartialInterface
         parent::setStackable($stackable);
     }
 
-
+    /** {@inheritDoc} */
     public function setStatus($status)
     {
         $this->changedProperties['status'] = true;
@@ -35,6 +44,7 @@ class PartialEvent extends BasicEvent implements PartialInterface
         parent::setStatus($status);
     }
 
+    /** {@inheritDoc} */
     public function setName($name)
     {
         $this->changedProperties['name'] = true;
@@ -42,6 +52,7 @@ class PartialEvent extends BasicEvent implements PartialInterface
         parent::setName($name);
     }
 
+    /** {@inheritDoc} */
     public function setDescription($description)
     {
         $this->changedProperties['description'] = true;
@@ -49,6 +60,7 @@ class PartialEvent extends BasicEvent implements PartialInterface
         parent::setDescription($description);
     }
 
+    /** {@inheritDoc} */
     public function setStart(DateTime $start)
     {
         $this->changedProperties['start'] = true;
@@ -56,6 +68,7 @@ class PartialEvent extends BasicEvent implements PartialInterface
         parent::setStart($start);
     }
 
+    /** {@inheritDoc} */
     public function setEnd(DateTime $end)
     {
         $this->changedProperties['end'] = true;
@@ -63,6 +76,7 @@ class PartialEvent extends BasicEvent implements PartialInterface
         parent::setEnd($end);
     }
 
+    /** {@inheritDoc} */
     public function addParticipation(BaseEventParticipation $participation)
     {
         $this->changedProperties['attendees'] = true;
@@ -70,6 +84,7 @@ class PartialEvent extends BasicEvent implements PartialInterface
         parent::addParticipation($participation);
     }
 
+    /** {@inheritDoc} */
     public function export()
     {
         $parentExport = parent::export();
