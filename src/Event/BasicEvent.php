@@ -75,8 +75,8 @@ class BasicEvent extends AbstractEvent
 
     public function setVisibility($visibility)
     {
-        if (!in_array($visibility, static::getVisibilties())) {
-            throw new InvalidArgumentException(sprintf('Wrong visibility ; had "%s", expected one of ["%s"]', $visibility, implode('", "', static::getVisibilties())));
+        if (!in_array($visibility, static::getVisibilities())) {
+            throw new InvalidArgumentException(sprintf('Wrong visibility ; had "%s", expected one of ["%s"]', $visibility, implode('", "', static::getVisibilities())));
         }
 
         $this->visibility = $visibility;
@@ -84,7 +84,7 @@ class BasicEvent extends AbstractEvent
         return $this;
     }
 
-    protected static function getVisibilties()
+    protected static function getVisibilities()
     {
         return [static::VISIBILITY_DEFAULT, static::VISIBILITY_PUBLIC, static::VISIBILITY_PRIVATE, static::VISIBILITY_CONFIDENTIAL];
     }
