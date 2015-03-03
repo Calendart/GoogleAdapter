@@ -88,7 +88,13 @@ class Calendar extends AbstractCalendar
             throw new InvalidArgumentException(sprintf('Missing at least one of the mandatory properties "id", "summary" or "timeZone" ; got ["%s"]', implode('", "', array_keys($data))));
         }
 
-        $calendar = new static($data['id'], $data['summary'], new DateTimeZone($data['timeZone']));
+        $timezone = null;
+
+        if (null !== $data['timeZone']) {
+            $timezone = new DateTimezone($data['timeZone']);
+        }
+
+        $calendar = new static($data['id'], $data['summary'], $timezone);
 
         if (isset($data['description'])) {
             $calendar->description = $data['description'];
