@@ -67,7 +67,7 @@ class GoogleAdapter implements AdapterInterface
     }
 
     /** {@inheritDoc} */
-    public function getEventApi(AbstractCalendar $calendar)
+    public function getEventApi(AbstractCalendar $calendar = null)
     {
         if (!$calendar instanceof Calendar) {
             throw new InvalidArgumentException('Wrong calendar provided, expected a google calendar');
