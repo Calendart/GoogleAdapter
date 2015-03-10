@@ -176,7 +176,7 @@ class EventApi implements EventApiInterface
         return $list;
     }
 
-    /** {@inheritDoc} */
+    /** @return Calendar */
     public function getCalendar()
     {
         return $this->calendar;
