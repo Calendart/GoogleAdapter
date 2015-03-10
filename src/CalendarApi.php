@@ -23,14 +23,15 @@ use CalendArt\Adapter\Google\Calendar,
     CalendArt\Adapter\Google\Criterion\Collection,
 
     CalendArt\AbstractCalendar,
-    CalendArt\Adapter\CalendarApiInterface;
+    CalendArt\Adapter\CalendarApiInterface,
+    CalendArt\Adapter\Calendar\AclInterface;
 
 /**
  * Google Adapter for the Calendars
  *
  * @author Baptiste Clavié <baptiste@wisembly.com>
  */
-class CalendarApi implements CalendarApiInterface
+class CalendarApi implements CalendarApiInterface, AclInterface
 {
     /** @var Guzzle Guzzle Http Client to use */
     private $guzzle;
