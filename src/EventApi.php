@@ -18,13 +18,13 @@ use GuzzleHttp\Client as Guzzle;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use CalendArt\Adapter\EventApiInterface,
-    CalendArt\Adapter\AbstractCriterion,
     CalendArt\AbstractEvent as CalendArtAbstractEvent,
     CalendArt\Adapter\Exception\CriterionNotFoundException,
 
     CalendArt\Adapter\Google\Event\BasicEvent,
     CalendArt\Adapter\Google\Exception\ApiErrorException,
 
+    CalendArt\Adapter\Google\AbstractCriterion,
     CalendArt\Adapter\Google\Criterion\Field,
     CalendArt\Adapter\Google\Criterion\Collection;
 

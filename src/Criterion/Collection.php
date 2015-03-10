@@ -11,7 +11,7 @@
 
 namespace CalendArt\Adapter\Google\Criterion;
 
-use CalendArt\Adapter\AbstractCriterion,
+use CalendArt\Adapter\Google\AbstractCriterion,
 
     CalendArt\Adapter\Google\Criterion\Collection\Element,
     CalendArt\Adapter\Google\Criterion\Collection\Reducible,

@@ -60,7 +60,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
     private function getCriterion($name, array $criteria = [])
     {
-        $mock = $this->getMockForAbstractClass('CalendArt\\Adapter\\AbstractCriterion', [$name, $criteria]);
+        $mock = $this->getMockForAbstractClass('CalendArt\\Adapter\\Google\\AbstractCriterion', [$name, $criteria]);
 
         $mock->expects(static::any())
              ->method('build')
