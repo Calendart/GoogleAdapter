@@ -16,7 +16,7 @@ use ReflectionMethod;
 use PHPUnit_Framework_TestCase;
 
 use CalendArt\Adapter\Google\AbstractCriterion,
-    CalendArt\Adapter\Exception\CriterionNotFoundException;
+    CalendArt\Adapter\Google\Exception\CriterionNotFoundException;
 
 class AbstractCriterionTest extends PHPUnit_Framework_TestCase
 {

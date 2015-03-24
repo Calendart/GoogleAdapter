@@ -19,10 +19,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use CalendArt\Adapter\EventApiInterface,
     CalendArt\AbstractEvent as CalendArtAbstractEvent,
-    CalendArt\Adapter\Exception\CriterionNotFoundException,
 
     CalendArt\Adapter\Google\Event\BasicEvent,
     CalendArt\Adapter\Google\Exception\ApiErrorException,
+    CalendArt\Adapter\Google\Exception\CriterionNotFoundException,
 
     CalendArt\Adapter\Google\AbstractCriterion,
     CalendArt\Adapter\Google\Criterion\Field,
