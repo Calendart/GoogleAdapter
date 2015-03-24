@@ -220,5 +220,11 @@ class EventApi implements EventApiInterface
             throw new ApiErrorException($response);
         }
     }
+
+    /** @return GoogleAdapter */
+    public function getAdapter()
+    {
+        return $this->adapter;
+    }
 }
 
