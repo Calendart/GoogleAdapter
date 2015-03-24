@@ -129,5 +129,11 @@ class CalendarApi implements CalendarApiInterface, AclInterface
 
         return $list;
     }
+
+    /** @return GoogleAdapter */
+    public function getAdapter()
+    {
+        return $this->adapter;
+    }
 }
 
