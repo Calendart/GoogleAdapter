@@ -84,10 +84,6 @@ class EventApi implements EventApiInterface
 
         $calendars[$this->calendar->getId()] = $this->calendar;
 
-        if (null !== $this->calendar->getSyncToken()) {
-            $query->addCriterion(new Collection([new Field($this->calendar->getSyncToken())], 'nextSyncToken'));
-        }
-
         $fields = [new Field('nextSyncToken'),
                    new Field('nextPageToken'),
                    new Field('items', $this->fields)];
@@ -110,7 +106,7 @@ class EventApi implements EventApiInterface
             $current = $query;
 
             if (null !== $nextPageToken) {
-                $current['nextPageToken'] = $nextPageToken;
+                $current['pageToken'] = $nextPageToken;
             }
 
             $response = $this->guzzle->get(sprintf('calendars/%s/events', $this->calendar->getId()), ['query' => $current]);
