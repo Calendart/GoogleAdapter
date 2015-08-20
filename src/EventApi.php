@@ -103,7 +103,7 @@ class EventApi implements EventApiInterface
             $current = $query;
 
             if (null !== $nextPageToken) {
-                $current['nextPageToken'] = $nextPageToken;
+                $current['pageToken'] = $nextPageToken;
             }
 
             $response = $this->guzzle->get(sprintf('calendars/%s/events', $this->calendar->getId()), ['query' => $current]);
