@@ -77,10 +77,6 @@ class EventApi implements EventApiInterface
         $query         = new Collection([]);
         $list          = new ArrayCollection;
 
-        if (null !== $this->calendar->getSyncToken()) {
-            $query->addCriterion(new Collection([new Field($this->calendar->getSyncToken())], 'nextSyncToken'));
-        }
-
         $fields = [new Field('nextSyncToken'),
                    new Field('nextPageToken'),
                    new Field('items', $this->fields)];
