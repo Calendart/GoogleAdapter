@@ -122,11 +122,11 @@ class BasicEvent extends AbstractEvent
 
         $end = null;
 
-        if (!isset($data['endTimeUnspecified']) || false === $data['endTimeUnspecified']) {
-            if (!isset($data['end'])) {
-                throw new InvalidArgumentException(sprintf('Missing at least the following mandatory property "end" ; got ["%s"]', implode('", "', array_keys($data))));
-            }
+        if (!isset($data['end']) && (!isset($data['endTimeUnspecified']) || false === $data['endTimeUnspecified'])) {
+            throw new InvalidArgumentException(sprintf('When the "end" property is missing, the "endTimeUnspecified" property must be specified or must be worth true'));
+        }
 
+        if (isset($data['end'])) {
             if (!is_array($data['end']))  {
                 throw new InvalidArgumentException('The start and the end dates should be an array');
             }
@@ -142,8 +142,11 @@ class BasicEvent extends AbstractEvent
 
         $event->end       = $end;
         $event->createdAt = new Datetime($data['created']);
-        $event->updatedAt = new Datetime($data['updated']);
         $event->start     = static::buildDate($data['start']);
+
+        if (isset($data['updated'])) {
+            $event->updatedAt = new Datetime($data['updated']);
+        }
 
         if (isset($data['summary'])) {
             $event->name = $data['summary'];
