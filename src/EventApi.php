@@ -193,7 +193,39 @@ class EventApi implements EventApiInterface
             throw new ApiErrorException($response);
         }
 
-        return BasicEvent::hydrate($this->calendar, $response->json());
+        $item = $response->json();
+
+        $calendar = $this->calendar;
+
+        // match the _real_ calendar for this event
+        if (isset($item['organizer']) && (!isset($item['organizer']['self']) || false === $item['organizer']['self'])) {
+            try {
+                $data = $item['organizer'];
+
+                // the email is usually an identifier for the calendars
+                if (!isset($data['id'])) {
+                    if (!isset($data['email'])) {
+                        throw new InvalidArgumentException;
+                    }
+
+                    $data['id'] = $data['email'];
+                }
+
+                $data += ['summary' => !isset($data['displayName'])
+                    ? !isset($data['email'])
+                        ? null
+                        : $data['email']
+                    : $data['displayName'],
+
+                    'timeZone' => null];
+
+                $calendar = Calendar::hydrate($data);
+            } catch (InvalidArgumentException $e) {
+                $calendar = $this->calendar;
+            }
+        }
+
+        return BasicEvent::hydrate($calendar, $response->json());
     }
 
     /** {@inheritDoc} */
