@@ -235,14 +235,20 @@ class EventApi implements EventApiInterface
             throw new InvalidArgumentException('Wrong event provided, expected a google event');
         }
 
-        $url = sprintf('calendars/%s/events/%s', $event->getCalendar()->getId(), $event->getId());
+        if (null !== $event->getId()) {
+            $url = sprintf('calendars/%s/events/%s', $event->getCalendar()->getId(), $event->getId());
+            $method = 'patch';
+        } else {
+            $url = sprintf('calendars/%s/events', $event->getCalendar()->getId());
+            $method = 'post';
+        }
 
         $options = [
             'headers' => ['Content-Type' => 'application/json'],
             'body' => json_encode($event->export())
         ];
 
-        $response = $this->guzzle->patch($url, $options);
+        $response = $this->guzzle->$method($url, $options);
 
         if (200 > $response->getStatusCode() || 300 <= $response->getStatusCode()) {
             throw new ApiErrorException($response);

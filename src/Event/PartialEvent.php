@@ -47,7 +47,7 @@ class PartialEvent extends BasicEvent implements PartialInterface
     /** {@inheritDoc} */
     public function setName($name)
     {
-        $this->changedProperties['name'] = true;
+        $this->changedProperties['summary'] = true;
 
         parent::setName($name);
     }
