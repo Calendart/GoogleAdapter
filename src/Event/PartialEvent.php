@@ -4,8 +4,9 @@ namespace CalendArt\Adapter\Google\Event;
 
 use DateTime;
 
-use CalendArt\Adapter\Google\PartialInterface,
-    CalendArt\EventParticipation as BaseEventParticipation;
+use CalendArt\Adapter\Google\Calendar;
+use CalendArt\Adapter\Google\PartialInterface;
+use CalendArt\EventParticipation as BaseEventParticipation;
 
 /**
  * Represents a PATCH'd event
@@ -47,7 +48,7 @@ class PartialEvent extends BasicEvent implements PartialInterface
     /** {@inheritDoc} */
     public function setName($name)
     {
-        $this->changedProperties['name'] = true;
+        $this->changedProperties['summary'] = true;
 
         parent::setName($name);
     }
@@ -99,5 +100,20 @@ class PartialEvent extends BasicEvent implements PartialInterface
         }
 
         return $export;
+    }
+
+    public static function hydrate(Calendar $calendar, array $data)
+    {
+        if (!isset($data['status'], $data['etag'])) {
+            throw new InvalidArgumentException(sprintf('Missing at least one of the mandatory properties "etag", "status" ; got ["%s"]', implode('", "', array_keys($data))));
+        }
+
+        $event = new static($calendar, $data['status']);
+
+        isset($data['id']) && $event->id = $data['id'];
+        $event->etag = $data['etag'];
+        $event->raw  = $data;
+
+        return $event;
     }
 }

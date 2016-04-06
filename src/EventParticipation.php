@@ -70,10 +70,11 @@ class EventParticipation extends BaseEventParticipation
      */
     public function export()
     {
-        return [
-            'email' => $this->getUser()->getEmail(),
-            'responseStatus' => $this->getStatus(),
-        ];
+        $export = ['email' => $this->getUser()->getEmail()];
+        if (null !== $this->getStatus()) {
+            $export['responseStatus'] = $this->getStatus();
+        };
+
+        return $export;
     }
 }
-
