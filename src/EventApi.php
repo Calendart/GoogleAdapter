@@ -253,6 +253,8 @@ class EventApi implements EventApiInterface
         if (200 > $response->getStatusCode() || 300 <= $response->getStatusCode()) {
             throw new ApiErrorException($response);
         }
+
+        return BasicEvent::hydrate($this->calendar, $response->json());
     }
 
     /** @return GoogleAdapter */
