@@ -148,13 +148,21 @@ abstract class AbstractEvent extends BaseAbstractEvent
      */
     public function export()
     {
-        return [
+        $base = [
             'summary' => $this->getName(),
             'description' => $this->getDescription(),
-            'start' => ['dateTime' => $this->getStart()->format('c')],
-            'end' => ['dateTime' => $this->getEnd()->format('c')],
             'attendees' => $this->getParticipations()->map(function(EventParticipation $participation) { return $participation->export(); })->toArray(),
         ];
+
+        if ($this->getStart() instanceof Datetime) {
+            $base['start'] = ['dateTime' => $this->getStart()->format('c')];
+        }
+
+        if ($this->getEnd() instanceof Datetime) {
+            $base['end'] = ['dateTime' => $this->getEnd()->format('c')];
+        }
+
+        return $base;
     }
 }
 
