@@ -21,6 +21,15 @@ class PartialEvent extends BasicEvent implements PartialInterface
     /** @var array */
     private $changedProperties = [];
 
+    public function __construct(Calendar $calendar, $id = null)
+    {
+        parent::__construct($calendar);
+
+        if (null !== $id) {
+            $this->id = $id;
+        }
+    }
+
     /** {@inheritDoc} */
     public function setVisibility($visibility)
     {
@@ -91,7 +100,7 @@ class PartialEvent extends BasicEvent implements PartialInterface
         $parentExport = parent::export();
         $export = [];
 
-        foreach($parentExport as $property => $value) {
+        foreach ($parentExport as $property => $value) {
             if (!isset($this->changedProperties[$property]) || true !== $this->changedProperties[$property]) {
                 continue;
             }
@@ -100,20 +109,5 @@ class PartialEvent extends BasicEvent implements PartialInterface
         }
 
         return $export;
-    }
-
-    public static function hydrate(Calendar $calendar, array $data)
-    {
-        if (!isset($data['status'], $data['etag'])) {
-            throw new InvalidArgumentException(sprintf('Missing at least one of the mandatory properties "etag", "status" ; got ["%s"]', implode('", "', array_keys($data))));
-        }
-
-        $event = new static($calendar, $data['status']);
-
-        isset($data['id']) && $event->id = $data['id'];
-        $event->etag = $data['etag'];
-        $event->raw  = $data;
-
-        return $event;
     }
 }
