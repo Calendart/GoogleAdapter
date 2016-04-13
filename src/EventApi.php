@@ -229,7 +229,7 @@ class EventApi implements EventApiInterface
     }
 
     /** {@inheritDoc} */
-    public function persist(CalendArtAbstractEvent $event)
+    public function persist(CalendArtAbstractEvent $event, array $options = [])
     {
         if (!$event instanceof AbstractEvent) {
             throw new InvalidArgumentException('Wrong event provided, expected a google event');
