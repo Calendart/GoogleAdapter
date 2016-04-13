@@ -228,7 +228,11 @@ class EventApi implements EventApiInterface
         return BasicEvent::hydrate($calendar, $response->json());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * $options['sendNotifications'] boolean Whether to send notifications about the event update.  Optional. The default is false.
+     */
     public function persist(CalendArtAbstractEvent $event, array $options = [])
     {
         if (!$event instanceof AbstractEvent) {
@@ -243,9 +247,18 @@ class EventApi implements EventApiInterface
             $method = 'post';
         }
 
+        $query = [];
+
+        // manage the options now
+        // should we send notifications to the attendees ?
+        if (isset($options['sendNotifications'])) {
+            $query['sendNotifications'] = $options['sendNotifications'] ? 'true' : 'false';
+        }
+
         $options = [
             'headers' => ['Content-Type' => 'application/json'],
-            'body' => json_encode($event->export())
+            'body' => json_encode($event->export()),
+            'query' => $query
         ];
 
         $response = $this->guzzle->$method($url, $options);
