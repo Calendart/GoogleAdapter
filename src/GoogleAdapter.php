@@ -19,7 +19,6 @@ use CalendArt\Adapter\AdapterInterface,
 
     CalendArt\Adapter\Google\Criterion\Field,
     CalendArt\Adapter\Google\Criterion\Collection,
-    CalendArt\Adapter\Google\Exception\ApiErrorException,
 
     CalendArt\AbstractCalendar;
 
@@ -35,6 +34,8 @@ use CalendArt\Adapter\AdapterInterface,
  */
 class GoogleAdapter implements AdapterInterface
 {
+    use ResponseHandler;
+
     /** @var Client Guzzle client to use when requesting things from google */
     private $guzzle;
 
@@ -95,9 +96,7 @@ class GoogleAdapter implements AdapterInterface
             $criterion = new Collection([new Collection($fields, 'fields')]);
             $response = $this->guzzle->get('../../plus/v1/people/me', ['query' => $criterion->build()]);
 
-            if (200 > $response->getStatusCode() || 300 <= $response->getStatusCode()) {
-                throw new ApiErrorException($response);
-            }
+            $this->handleResponse($response);
 
             $emails = [];
             $result = $response->json();
