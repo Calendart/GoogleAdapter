@@ -17,16 +17,13 @@ use GuzzleHttp\Client as Guzzle;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use CalendArt\Adapter\EventApiInterface,
-    CalendArt\AbstractEvent as CalendArtAbstractEvent,
+use CalendArt\Adapter\EventApiInterface;
+use CalendArt\AbstractEvent as CalendArtAbstractEvent;
 
-    CalendArt\Adapter\Google\Event\BasicEvent,
-    CalendArt\Adapter\Google\Exception\ApiErrorException,
-    CalendArt\Adapter\Google\Exception\CriterionNotFoundException,
-
-    CalendArt\Adapter\Google\AbstractCriterion,
-    CalendArt\Adapter\Google\Criterion\Field,
-    CalendArt\Adapter\Google\Criterion\Collection;
+use CalendArt\Adapter\Google\Event\BasicEvent;
+use CalendArt\Adapter\Google\Exception\CriterionNotFoundException;
+use CalendArt\Adapter\Google\Criterion\Field;
+use CalendArt\Adapter\Google\Criterion\Collection;
 
 /**
  * Google Adapter for the Calendars
@@ -35,6 +32,8 @@ use CalendArt\Adapter\EventApiInterface,
  */
 class EventApi implements EventApiInterface
 {
+    use ResponseHandler;
+
     /** @var Guzzle Guzzle Http Client to use */
     private $guzzle;
 
@@ -111,9 +110,7 @@ class EventApi implements EventApiInterface
 
             $response = $this->guzzle->get(sprintf('calendars/%s/events', $this->calendar->getId()), ['query' => $current]);
 
-            if (200 > $response->getStatusCode() || 300 <= $response->getStatusCode()) {
-                throw new ApiErrorException($response);
-            }
+            $this->handleResponse($response);
 
             $result = $response->json();
 
@@ -189,9 +186,7 @@ class EventApi implements EventApiInterface
 
         $response = $this->guzzle->get(sprintf('calendars/%s/events/%s', $this->calendar->getId(), $identifier), ['query' => $query->build()]);
 
-        if (200 > $response->getStatusCode() || 300 <= $response->getStatusCode()) {
-            throw new ApiErrorException($response);
-        }
+        $this->handleResponse($response);
 
         $item = $response->json();
 
@@ -263,9 +258,7 @@ class EventApi implements EventApiInterface
 
         $response = $this->guzzle->$method($url, $options);
 
-        if (200 > $response->getStatusCode() || 300 <= $response->getStatusCode()) {
-            throw new ApiErrorException($response);
-        }
+        $this->handleErrors($response);
 
         return BasicEvent::hydrate($this->calendar, $response->json());
     }

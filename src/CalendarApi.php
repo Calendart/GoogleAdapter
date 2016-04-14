@@ -15,16 +15,11 @@ use GuzzleHttp\Client as Guzzle;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use CalendArt\Adapter\Google\Calendar,
-    CalendArt\Adapter\Google\Exception\ApiErrorException,
-
-    CalendArt\Adapter\Google\AbstractCriterion,
-    CalendArt\Adapter\Google\Criterion\Field,
-    CalendArt\Adapter\Google\Criterion\Collection,
-
-    CalendArt\AbstractCalendar,
-    CalendArt\Adapter\CalendarApiInterface,
-    CalendArt\Adapter\Calendar\AclInterface;
+use CalendArt\Adapter\Google\Criterion\Field;
+use CalendArt\Adapter\Google\Criterion\Collection;
+use CalendArt\AbstractCalendar;
+use CalendArt\Adapter\CalendarApiInterface;
+use CalendArt\Adapter\Calendar\AclInterface;
 
 /**
  * Google Adapter for the Calendars
@@ -33,6 +28,8 @@ use CalendArt\Adapter\Google\Calendar,
  */
 class CalendarApi implements CalendarApiInterface, AclInterface
 {
+    use ResponseHandler;
+
     /** @var Guzzle Guzzle Http Client to use */
     private $guzzle;
 
@@ -64,9 +61,7 @@ class CalendarApi implements CalendarApiInterface, AclInterface
 
         $response = $this->guzzle->get('users/me/calendarList', ['query' => $query->build()]);
 
-        if (200 > $response->getStatusCode() || 300 <= $response->getStatusCode()) {
-            throw new ApiErrorException($response);
-        }
+        $this->handleResponse($response);
 
         $result = $response->json();
         $list   = new ArrayCollection;
@@ -89,9 +84,7 @@ class CalendarApi implements CalendarApiInterface, AclInterface
 
         $response = $this->guzzle->get(sprintf('calendars/%s', $identifier), ['query' => $query->build()]);
 
-        if (200 > $response->getStatusCode() || 300 <= $response->getStatusCode()) {
-            throw new ApiErrorException($response);
-        }
+        $this->handleResponse($response);
 
         return Calendar::hydrate($response->json(), $this->adapter->getUser());
     }
@@ -107,9 +100,7 @@ class CalendarApi implements CalendarApiInterface, AclInterface
 
         $response = $this->guzzle->get(sprintf('calendars/%s/acl', $calendar->getId()), ['query' => $query->build()]);
 
-        if (200 > $response->getStatusCode() || 300 <= $response->getStatusCode()) {
-            throw new ApiErrorException($response);
-        }
+        $this->handleResponse($response);
 
         $result = $response->json();
         $list   = new ArrayCollection;
