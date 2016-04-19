@@ -258,7 +258,7 @@ class EventApi implements EventApiInterface
 
         $response = $this->guzzle->$method($url, $options);
 
-        $this->handleErrors($response);
+        $this->handleResponse($response);
 
         return BasicEvent::hydrate($this->calendar, $response->json());
     }
