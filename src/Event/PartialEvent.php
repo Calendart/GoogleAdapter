@@ -3,6 +3,9 @@
 namespace CalendArt\Adapter\Google\Event;
 
 use DateTime;
+use InvalidArgumentException;
+
+use Doctrine\Common\Collections\Collection;
 
 use CalendArt\Adapter\Google\Calendar;
 use CalendArt\Adapter\Google\PartialInterface;
@@ -92,6 +95,18 @@ class PartialEvent extends BasicEvent implements PartialInterface
         $this->changedProperties['attendees'] = true;
 
         parent::addParticipation($participation);
+    }
+
+    public function setParticipations(Collection $participations)
+    {
+        foreach ($participations as $participation) {
+            if (!$participation instanceof BaseEventParticipation) {
+                throw new InvalidArgumentException('All participations must be instance of CalendArt\EventParticipation');
+            }
+        }
+
+        $this->changedProperties['attendees'] = true;
+        $this->participations = $participations;
     }
 
     /** {@inheritDoc} */
