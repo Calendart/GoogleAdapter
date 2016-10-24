@@ -14,7 +14,7 @@ namespace CalendArt\Adapter\Google;
 use Doctrine\Common\Collections\Collection,
     Doctrine\Common\Collections\ArrayCollection;
 
-use Datetime,
+use DateTime,
     DateTimeZone,
     InvalidArgumentException;
 
@@ -124,7 +124,7 @@ abstract class AbstractEvent extends BaseAbstractEvent
      *
      * @param array $data Date data
      *
-     * @return Datetime
+     * @return DateTime
      */
     protected static function buildDate(array $data)
     {
@@ -132,10 +132,17 @@ abstract class AbstractEvent extends BaseAbstractEvent
             throw new InvalidArgumentException(sprintf('This date seems to be malformed. Expected a `date` or `dateTime` key ; had [`%s`]', implode('`, `', array_keys($data))));
         }
 
-        $date = new Datetime(isset($data['date']) ? $data['date'] : $data['dateTime']);
+        $date = new DateTime(isset($data['date']) ? $data['date'] : $data['dateTime']);
 
         if (isset($data['timeZone'])) {
-            $date->setTimezone(new DateTimezone($data['timeZone']));
+
+            try {
+                $date->setTimezone(new DateTimeZone($data['timeZone']));
+            } catch (Exception $e) {
+                // The timezone given by the provider isn't supported by the DateTimeZone object.
+                // This is the case for Asia/Yangon already met.
+                // Catch the exception is better than using the list from timezone_identifiers_list() because it's not a complete one.
+            }
         }
 
         return $date;
@@ -154,11 +161,11 @@ abstract class AbstractEvent extends BaseAbstractEvent
             'attendees' => $this->getParticipations()->map(function(EventParticipation $participation) { return $participation->export(); })->toArray(),
         ];
 
-        if ($this->getStart() instanceof Datetime) {
+        if ($this->getStart() instanceof DateTime) {
             $base['start'] = ['dateTime' => $this->getStart()->format('c')];
         }
 
-        if ($this->getEnd() instanceof Datetime) {
+        if ($this->getEnd() instanceof DateTime) {
             $base['end'] = ['dateTime' => $this->getEnd()->format('c')];
         }
 
