@@ -28,9 +28,6 @@
         "psr-4": {
             "CalendArt\\Adapter\\Google\\": ["src/", "test/"]
         }
-    },
-
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }
 
