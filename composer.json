@@ -21,7 +21,7 @@
 
         "psr/log": "^1.0",
         "doctrine/collections": "^1.0",
-        "guzzlehttp/guzzle": "^4.1"
+        "guzzlehttp/guzzle": "^4.1|^5.0"
     },
 
     "autoload": {
