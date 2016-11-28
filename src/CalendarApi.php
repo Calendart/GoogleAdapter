@@ -11,8 +11,6 @@
 
 namespace CalendArt\Adapter\Google;
 
-use GuzzleHttp\Client as Guzzle;
-
 use Doctrine\Common\Collections\ArrayCollection;
 
 use CalendArt\Adapter\Google\Criterion\Field;
@@ -28,17 +26,11 @@ use CalendArt\Adapter\Calendar\AclInterface;
  */
 class CalendarApi implements CalendarApiInterface, AclInterface
 {
-    use ResponseHandler;
-
-    /** @var Guzzle Guzzle Http Client to use */
-    private $guzzle;
-
     /** @var GoogleAdapter Google Adapter used */
     private $adapter;
 
-    public function __construct(Guzzle $client, GoogleAdapter $adapter)
+    public function __construct(GoogleAdapter $adapter)
     {
-        $this->guzzle  = $client;
         $this->adapter = $adapter;
 
         $this->criteria = [new Field('id'),
@@ -59,11 +51,7 @@ class CalendarApi implements CalendarApiInterface, AclInterface
             $query = $query->merge($criterion);
         }
 
-        $response = $this->guzzle->get('users/me/calendarList', ['query' => $query->build()]);
-
-        $this->handleResponse($response);
-
-        $result = $response->json();
+        $result = $this->adapter->sendRequest('get', '/calendar/v3/users/me/calendarList', ['query' => $query->build()]);
         $list   = new ArrayCollection;
 
         foreach ($result['items'] as $item) {
@@ -82,11 +70,9 @@ class CalendarApi implements CalendarApiInterface, AclInterface
             $query = $query->merge($criterion);
         }
 
-        $response = $this->guzzle->get(sprintf('calendars/%s', $identifier), ['query' => $query->build()]);
+        $response = $this->adapter->sendRequest('get', sprintf('/calendar/v3/calendars/%s', $identifier), ['query' => $query->build()]);
 
-        $this->handleResponse($response);
-
-        return Calendar::hydrate($response->json(), $this->adapter->getUser());
+        return Calendar::hydrate($response, $this->adapter->getUser());
     }
 
     /** {@inheritDoc} */
@@ -98,11 +84,7 @@ class CalendarApi implements CalendarApiInterface, AclInterface
             $query = $query->merge($criterion);
         }
 
-        $response = $this->guzzle->get(sprintf('calendars/%s/acl', $calendar->getId()), ['query' => $query->build()]);
-
-        $this->handleResponse($response);
-
-        $result = $response->json();
+        $result = $this->adapter->sendRequest('get', sprintf('/calendar/v3/calendars/%s/acl', $calendar->getId()), ['query' => $query->build()]);
         $list   = new ArrayCollection;
 
         foreach ($result['items'] as $item) {
@@ -127,4 +109,3 @@ class CalendarApi implements CalendarApiInterface, AclInterface
         return $this->adapter;
     }
 }
-
