@@ -13,8 +13,6 @@ namespace CalendArt\Adapter\Google;
 
 use InvalidArgumentException;
 
-use GuzzleHttp\Client as Guzzle;
-
 use Doctrine\Common\Collections\ArrayCollection;
 
 use CalendArt\Adapter\EventApiInterface;
@@ -32,11 +30,6 @@ use CalendArt\Adapter\Google\Criterion\Collection;
  */
 class EventApi implements EventApiInterface
 {
-    use ResponseHandler;
-
-    /** @var Guzzle Guzzle Http Client to use */
-    private $guzzle;
-
     /** @var Calendar */
     private $calendar;
 
@@ -46,9 +39,8 @@ class EventApi implements EventApiInterface
     /** @var GoogleAdapter */
     private $adapter;
 
-    public function __construct(Guzzle $client, GoogleAdapter $adapter, Calendar $calendar)
+    public function __construct(GoogleAdapter $adapter, Calendar $calendar)
     {
-        $this->guzzle   = $client;
         $this->adapter  = $adapter;
         $this->calendar = $calendar;
 
@@ -108,11 +100,11 @@ class EventApi implements EventApiInterface
                 $current['pageToken'] = $nextPageToken;
             }
 
-            $response = $this->guzzle->get(sprintf('calendars/%s/events', $this->calendar->getId()), ['query' => $current]);
-
-            $this->handleResponse($response);
-
-            $result = $response->json();
+            $result = $this->adapter->sendRequest(
+                'get',
+                sprintf('/calendar/v3/calendars/%s/events', $this->calendar->getId()),
+                ['query' => $current]
+            );
 
             foreach ($result['items'] as $item) {
                 // ignore the short cancelled recurring events
@@ -184,18 +176,18 @@ class EventApi implements EventApiInterface
             $query = $query->merge($criterion);
         }
 
-        $response = $this->guzzle->get(sprintf('calendars/%s/events/%s', $this->calendar->getId(), $identifier), ['query' => $query->build()]);
-
-        $this->handleResponse($response);
-
-        $item = $response->json();
+        $result = $this->adapter->sendRequest(
+            'get',
+            sprintf('/calendar/v3/calendars/%s/events/%s', $this->calendar->getId(), $identifier),
+            ['query' => $query->build()]
+        );
 
         $calendar = $this->calendar;
 
         // match the _real_ calendar for this event
-        if (isset($item['organizer']) && (!isset($item['organizer']['self']) || false === $item['organizer']['self'])) {
+        if (isset($result['organizer']) && (!isset($result['organizer']['self']) || false === $result['organizer']['self'])) {
             try {
-                $data = $item['organizer'];
+                $data = $result['organizer'];
 
                 // the email is usually an identifier for the calendars
                 if (!isset($data['id'])) {
@@ -220,13 +212,14 @@ class EventApi implements EventApiInterface
             }
         }
 
-        return BasicEvent::hydrate($calendar, $response->json());
+        return BasicEvent::hydrate($calendar, $result);
     }
 
     /**
      * {@inheritDoc}
      *
-     * $options['sendNotifications'] boolean Whether to send notifications about the event update.  Optional. The default is false.
+     * $options['sendNotifications'] boolean Whether to send notifications about the event update.
+     * Optional. The default is false.
      */
     public function persist(CalendArtAbstractEvent $event, array $options = [])
     {
@@ -235,10 +228,10 @@ class EventApi implements EventApiInterface
         }
 
         if (null !== $event->getId()) {
-            $url = sprintf('calendars/%s/events/%s', $event->getCalendar()->getId(), $event->getId());
+            $url = sprintf('/calendar/v3/calendars/%s/events/%s', $event->getCalendar()->getId(), $event->getId());
             $method = 'patch';
         } else {
-            $url = sprintf('calendars/%s/events', $event->getCalendar()->getId());
+            $url = sprintf('/calendar/v3/calendars/%s/events', $event->getCalendar()->getId());
             $method = 'post';
         }
 
@@ -250,17 +243,8 @@ class EventApi implements EventApiInterface
             $query['sendNotifications'] = $options['sendNotifications'] ? 'true' : 'false';
         }
 
-        $options = [
-            'headers' => ['Content-Type' => 'application/json'],
-            'body' => json_encode($event->export()),
-            'query' => $query
-        ];
-
-        $response = $this->guzzle->$method($url, $options);
-
-        $this->handleResponse($response);
-
-        return BasicEvent::hydrate($this->calendar, $response->json());
+        $result = $this->adapter->sendRequest($method, $url, ['query' => $query], json_encode($event->export()));
+        return BasicEvent::hydrate($this->calendar, $result);
     }
 
     /** @return GoogleAdapter */
@@ -269,4 +253,3 @@ class EventApi implements EventApiInterface
         return $this->adapter;
     }
 }
-

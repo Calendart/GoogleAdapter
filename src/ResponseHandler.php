@@ -2,7 +2,7 @@
 
 namespace CalendArt\Adapter\Google;
 
-use GuzzleHttp\Message\ResponseInterface;
+use Psr\Http\Message\ResponseInterface;
 
 trait ResponseHandler
 {
