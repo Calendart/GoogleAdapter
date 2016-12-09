@@ -28,6 +28,9 @@ class User extends BaseUser
     /** @var array $raw The raw response stored for this object */
     protected $raw;
 
+    /** @var boolean corresponds to the calendar on which this copy of the event appears. */
+    protected $self = false;
+
     public function __construct($name, $email, $id = null)
     {
         parent::__construct($name, (array) $email);
@@ -79,9 +82,18 @@ class User extends BaseUser
             $user->id = $data['id'];
         }
 
+        if (isset($data['self'])) {
+            $user->self = $data['self'];
+        }
+
         $user->raw = $data;
 
         return $user;
+    }
+
+    public function isSelf()
+    {
+        return $this->self;
     }
 }
 
