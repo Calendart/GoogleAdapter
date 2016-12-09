@@ -51,6 +51,9 @@ class BasicEvent extends AbstractEvent
     /** @var string Event's visibility */
     private $visibility = self::VISIBILITY_DEFAULT;
 
+    /** @var User organizer of this event */
+    protected $organizer;
+
     /** @return Datetime */
     public function getCreatedAt()
     {
@@ -160,6 +163,11 @@ class BasicEvent extends AbstractEvent
             $event->description = $data['description'];
         }
 
+        if (isset($data['organizer'])) {
+            $organizer = static::buildUser($data['organizer'])->addEvent($event);
+            $event->organizer = $organizer;
+        }
+
         if (isset($data['attendees'])) {
             $event->participations = static::buildParticipations($event, $data['attendees']);
         }
@@ -196,6 +204,7 @@ class BasicEvent extends AbstractEvent
 
             if (isset($attendee['organizer']) && true === $attendee['organizer']) {
                 $role |= EventParticipation::ROLE_MANAGER;
+                $this->organizer = $user;
             }
 
             $participation = new EventParticipation($event, $user, $role, EventParticipation::translateStatus($attendee['responseStatus']));
@@ -237,6 +246,11 @@ class BasicEvent extends AbstractEvent
         }
 
         return static::$users[$id];
+    }
+
+    public function getOrganizer()
+    {
+        return $this->organizer;
     }
 }
 
