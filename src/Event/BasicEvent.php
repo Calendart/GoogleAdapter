@@ -204,7 +204,7 @@ class BasicEvent extends AbstractEvent
 
             if (isset($attendee['organizer']) && true === $attendee['organizer']) {
                 $role |= EventParticipation::ROLE_MANAGER;
-                $this->organizer = $user;
+                $event->organizer = $user;
             }
 
             $participation = new EventParticipation($event, $user, $role, EventParticipation::translateStatus($attendee['responseStatus']));
