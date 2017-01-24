@@ -162,11 +162,17 @@ abstract class AbstractEvent extends BaseAbstractEvent
         ];
 
         if ($this->getStart() instanceof DateTime) {
-            $base['start'] = ['dateTime' => $this->getStart()->format('c')];
+            $base['start'] = [
+                'dateTime' => $this->getStart()->format('c'),
+                'timeZone' => $this->getStart()->getTimezone()->getName()
+            ];
         }
 
         if ($this->getEnd() instanceof DateTime) {
-            $base['end'] = ['dateTime' => $this->getEnd()->format('c')];
+            $base['end'] = [
+                'dateTime' => $this->getEnd()->format('c'),
+                'timeZone' => $this->getStart()->getTimezone()->getName()
+            ];
         }
 
         return $base;
