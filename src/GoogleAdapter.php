@@ -166,10 +166,7 @@ class GoogleAdapter implements AdapterInterface
     {
         // deal with query string parameters
         if (isset($headers['query'])) {
-            $uri = sprintf('%s?%s', $uri, implode('&', array_map(function ($k, $v) {
-                $v = is_array($v) ? implode(',', $v) : $v;
-                return sprintf('%s=%s', $k, $v);
-            }, array_keys($headers['query']), array_values($headers['query']))));
+            $uri = sprintf('%s?%s', $uri, http_build_query($headers['query']));
             unset($headers['query']);
         }
 
