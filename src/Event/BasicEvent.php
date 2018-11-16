@@ -11,16 +11,17 @@
 
 namespace CalendArt\Adapter\Google\Event;
 
-use Datetime,
-    InvalidArgumentException;
+use Datetime;
+use InvalidArgumentException;
 
-use Doctrine\Common\Collections\Collection,
-    Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
-use CalendArt\Adapter\Google\User,
-    CalendArt\Adapter\Google\Calendar,
-    CalendArt\Adapter\Google\AbstractEvent,
-    CalendArt\Adapter\Google\EventParticipation;
+use CalendArt\Adapter\Google\User;
+use CalendArt\Adapter\Google\Calendar;
+use CalendArt\Adapter\Google\Attachment;
+use CalendArt\Adapter\Google\AbstractEvent;
+use CalendArt\Adapter\Google\EventParticipation;
 
 /**
  * Base event class for google events
@@ -174,6 +175,12 @@ class BasicEvent extends AbstractEvent
 
         if (isset($data['transparent'])) {
             $event->stackable = true === $data['transparent'];
+        }
+
+        if (isset($data['attachments'])) {
+            $this->attachments = array_map(function ($attachment) {
+                return Attachment::hydrate($attachment);
+            }, $data['attachments']);
         }
 
         $owner = static::buildUser($data['creator'])->addEvent($event);
